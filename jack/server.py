@@ -2,17 +2,15 @@
 
 import argparse
 import beanstalkc
-import contextlib
 import importlib
 import logging
 import multiprocessing as mp
 import os
-import platform
 import signal
 import time
 
 from jack.codec import serialize, deserialize
-from jack.util import ServerResult
+from jack.util import default_host, default_port, ServerResult
 
 log = logging.getLogger(__name__)
 stop = False
@@ -75,8 +73,8 @@ def parse_args():
     parser.add_argument('-i', '--imports', help='Comma separated list of task containing packages to import.')
     parser.add_argument('-q', '--queues', default='default', help='Comma separated list of queues to consume.')
     parser.add_argument('-w', '--workers', default=mp.cpu_count(), type=int, help='Number of worker processes to use.')
-    parser.add_argument('--host', default=platform.node())
-    parser.add_argument('-p', '--port', default=14711, type=int)
+    parser.add_argument('--host', default=default_host)
+    parser.add_argument('-p', '--port', default=default_port, type=int)
     return parser.parse_args()
 
 

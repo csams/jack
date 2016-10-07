@@ -9,7 +9,7 @@ import Queue
 from contextlib import closing
 
 from jack.codec import deserialize, serialize
-from jack.util import node_name, ServerResult
+from jack.util import default_host, default_port, ServerResult
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class Result(object):
 
 
 class HostManager(object):
-    def __init__(self, host=node_name, port=14711, pool_size=10):
+    def __init__(self, host=default_host, port=default_port, pool_size=10):
         self.host = host
         self.port = port
         self.pool_size = pool_size

@@ -7,7 +7,7 @@ from contextlib import closing
 
 from jack.codec import serialize, deserialize
 from jack.registry import ManagerRegistry, TaskRegistry
-from jack.util import ServerResult, node_name
+from jack.util import ServerResult, default_host, default_port
 
 log = logging.getLogger(__name__)
 stop = False
@@ -98,7 +98,7 @@ class Task(object):
         return ManagerRegistry.get(self.host, self.port).apply_async(dc)
 
 
-def task(host=node_name, port=14711, queue='default', expect_result=True, ttr=DEFAULT_TTR):
+def task(host=default_host, port=default_port, queue='default', expect_result=True, ttr=DEFAULT_TTR):
     def inner(func):
         name = '.'.join([func.__module__, func.__name__])
         TaskRegistry.register(name, func)

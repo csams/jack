@@ -3,7 +3,7 @@ Simple Python task framework for beanstalkd
 
 ## Start beanstalkd in the background on some node
 ```bash
-beanstalkd -l 127.0.0.1 -p 14711 2>&1 > beanstalk.out &
+beanstalkd -l 0.0.0.0 -p 11300 2>&1 > beanstalk.out &
 ```
 
 ## Create some tasks you want to execute remotely
@@ -55,8 +55,7 @@ If you want your task to execute on a host other
 than the one for which it was originally declared,
 just ensure a HostManager is created and change
 the host attribute on the task. The default host
-if none is given is platform.node(), which typically
-is localhost.
+if none is given is 0.0.0.0.
 ```python
 # main.py
 
