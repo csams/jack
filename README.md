@@ -56,7 +56,7 @@ with closing(ManagerRegistry.create(host='my.host.com')):
 ```
 
 ## Multiple Hosts
-If you want your```python
+```python
 # main.py
 
 from contextlib import closing
