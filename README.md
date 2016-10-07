@@ -31,8 +31,23 @@ from jack import ManagerRegistry
 from ops import add
 
 with closing(ManagerRegistry.create()):
-    result = add.apply_async(2, 3).get()
+
+    # executes directly in the this process
+    result = add(2, 3)
     print result
+
+    # executes remotely but synchronously for
+    # this process
+    result = add.apply(2, 3)
+
+    # executes remotely and asynchronously for
+    # this process
+    result = add.apply_async(2, 3)
+
+    # either return the result or throw an exception
+    # if an exception is thrown on the remote side, it is
+    # re raised here.
+    print result.get()
 ```
 
 ## Dynamic Dispatch
