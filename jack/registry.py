@@ -132,6 +132,19 @@ class ManagerRegistry(object):
         cls.registry[(manager.host, manager.port)] = manager
 
     @classmethod
+    def remove(cls, manager):
+        key = (manager.host, manager.port)
+        if key in cls.registry:
+            cls.registry[key].close()
+            del cls.registry[key]
+
+    @classmethod
+    def close(cls):
+        for k, v in cls.registry.iteritems():
+            v.close()
+        cls.registry = {}
+
+    @classmethod
     def create(cls, *args, **kwargs):
         hm = HostManager(*args, **kwargs)
         cls.add(hm)
