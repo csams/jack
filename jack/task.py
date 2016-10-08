@@ -7,11 +7,12 @@ from contextlib import closing
 
 from jack.codec import serialize, deserialize
 from jack.registry import ManagerRegistry, TaskRegistry
-from jack.util import ServerResult, default_host, default_port
+from jack.util import ServerResult, default_host, default_port # noqa F401
 
 log = logging.getLogger(__name__)
 stop = False
 DEFAULT_TTR = beanstalkc.DEFAULT_TTR
+
 
 class DelayedCall(object):
     serial_id = 1
@@ -87,9 +88,9 @@ class Task(object):
                 job = beanstalk.reserve()
                 result = deserialize(job.body)
                 if result.value:
-                  return result.value
+                    return result.value
                 if result.exception:
-                  raise result.exception
+                    raise result.exception
 
     def apply_async(self, *args, **kwargs):
         d = self.delegate

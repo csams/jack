@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 
 import os
 from setuptools import setup, find_packages
@@ -14,12 +14,14 @@ class CustomCommand(Command):
     def finalize_options(self):
         self.cwd = os.getcwd()
 
+
 class CleanCommand(CustomCommand):
     description = "clean up the current environment"
 
     def run(self):
         assert os.getcwd() == self.cwd, 'Must be in package root: %s' % self.cwd
         os.system('rm -rf ./bin ./build ./include ./lib ./lib64 ./*.egg-info ./man ./dist ./pip-selfcheck.json')
+
 
 class BootstrapCommand(CustomCommand):
     description = "bootstrap for development"
@@ -28,6 +30,8 @@ class BootstrapCommand(CustomCommand):
         assert os.getcwd() == self.cwd, 'Must be in package root: %s' % self.cwd
         os.system('virtualenv .')
         os.system('bin/pip install --upgrade pip')
+
+
 setup(
     name='Jack',
     version='0.1',
@@ -39,10 +43,11 @@ setup(
         'beanstalkc',
         'importlib',
         'PyYAML'
-    ],  
-    extras_require={"develop": [    
-        'ipython',
-    ]}, 
+    ],
+    extras_require={"develop": [
+        'flake8',
+        'ipython'
+    ]},
     cmdclass={
         'clean': CleanCommand,
         'bootstrap': BootstrapCommand

@@ -15,6 +15,7 @@ from jack.util import default_host, default_port, ServerResult
 log = logging.getLogger(__name__)
 stop = False
 
+
 def stop_handler(sig, frame):
     global stop
     stop = True

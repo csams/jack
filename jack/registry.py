@@ -9,11 +9,12 @@ import Queue
 from contextlib import closing
 
 from jack.codec import deserialize, serialize
-from jack.util import default_host, default_port, ServerResult
+from jack.util import default_host, default_port, ServerResult # noqa F401
 
 log = logging.getLogger(__name__)
 
 stop = False
+
 
 def stop_handler(sig, frame):
     global stop
@@ -100,7 +101,7 @@ class HostManager(object):
     def close(self):
         for w in self.workers:
             w.terminate()
-        
+
         self.task_queue.close()
         self.task_queue.join()
         self.result_queue.close()
@@ -113,6 +114,7 @@ class HostManager(object):
         self.task_queue.put(obj)
         return Result(self, obj.id)
 
+
 class TaskRegistry(object):
     registry = {}
 
@@ -123,6 +125,7 @@ class TaskRegistry(object):
     @classmethod
     def get(cls, name, default=None):
         return cls.registry.get(name, default)
+
 
 class ManagerRegistry(object):
     registry = {}

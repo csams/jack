@@ -22,6 +22,7 @@ with closing(ManagerRegistry.create()) as hm:
     signal.signal(signal.SIGINT, sig_handler)
 
     tests = []
+
     def test(func):
         def inner():
             log.info("Testing %s" % func.__name__)
