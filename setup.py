@@ -47,6 +47,7 @@ setup(
     extras_require={"develop": [
         'flake8',
         'ipython'
+        'pytest'
     ]},
     cmdclass={
         'clean': CleanCommand,

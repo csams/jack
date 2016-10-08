@@ -24,11 +24,9 @@ def stop_handler(sig, frame):
 def handle_processor(processor):
     try:
         result = processor.call()
-        log.debug(result)
         if processor.expect_result:
             return ServerResult(value=result, id=processor.id, exception=None, seq_id=processor.seq_id)
     except Exception as ex:
-        log.debug(ex)
         if processor.expect_result:
             return ServerResult(value=None, id=processor.id, exception=ex, seq_id=processor.seq_id)
 
