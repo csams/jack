@@ -95,9 +95,11 @@ class Task(object):
         }
         chunks = [args_list[i:i + chunk_size] for i in xrange(0, len(args_list), chunk_size)]
         dcs = []
+        seq_id = 0
         for args in chunks:
             dc = DelayedCall(self.name, args, **opts)
-            dc.seq_id += 1
+            dc.seq_id = seq_id
+            seq_id += 1
             dcs.append(dc)
         return ManagerRegistry.get(self.host, self.port).map(dcs)
 

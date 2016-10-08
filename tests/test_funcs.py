@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import logging
+import pytest
 import random
 import unittest
 
@@ -20,7 +21,13 @@ class Test(unittest.TestCase):
     def tearDownClass(cls):
         cls.hm.close()
 
-    def test_add(self):
+    def test_local(self):
+        self.assertEqual(7, add(3, 4))
+
+    def test_remote_sync(self):
+        self.assertEqual(7, add.apply(3, 4))
+
+    def test_remote_async(self):
         results = []
         expected_results = []
         for _ in range(100):
@@ -32,25 +39,41 @@ class Test(unittest.TestCase):
         pairs = zip(expected_results, [r.get() for r in results])
 
         for a, b in pairs:
-            assert a == b, '%s != %s' % (a, b)
-
-    def test_boom(self):
-        result = blow_up.apply_async()
-        try:
-            result.get()
-            assert False, "Expected Exception!"
-        except:
-            pass
+            self.assertEqual(a, b)
 
     def test_map(self):
         result = add.map([((3, 4), {}), ((4, 10), {})])
         sum_ = result.get()
-        assert sum_ == [7, 14]
+        self.assertEquals(sum_, [7, 14])
+
+    def test_large_map(self):
+        pairs = []
+        expected = []
+        for i in range(100):
+            pairs.append(([i, i+1], {}))
+            expected.append(i + (i+1))
+        result = add.map(pairs)
+        sum_ = result.get()
+        self.assertEquals(sum_, expected)
+
+    def test_local_boom(self):
+        with pytest.raises(Exception) as ex:
+            blow_up()
+        self.assertTrue(ex.value.message == 'boom')
+
+    def test_remote_sync_boom(self):
+        with pytest.raises(Exception) as ex:
+            blow_up.apply()
+        self.assertTrue(ex.value.message == 'boom')
+
+    def test_remote_async_boom(self):
+        with pytest.raises(Exception) as ex:
+            result = blow_up.apply_async()
+            result.get()
+        self.assertTrue(ex.value.message == 'boom')
 
     def test_map_boom(self):
-        result = blow_up2.map([((None,), {}), ((None,), {})])
-        try:
+        with pytest.raises(Exception) as ex:
+            result = blow_up2.map([((None,), {}), ((None,), {})])
             result.get()
-            assert False, "Expected Exception!"
-        except:
-            pass
+        self.assertTrue(ex.value.message == 'boom')
