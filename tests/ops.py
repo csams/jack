@@ -15,3 +15,8 @@ def add(a, b):
 @task()
 def blow_up():
     raise Exception('boom')
+
+
+@task()
+def blow_up2(arg):
+    raise Exception('boom')

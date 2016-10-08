@@ -55,9 +55,44 @@ def local_worker(task_queue, result_queue, host, port):
                     job.delete()
                     result_queue.put(result)
             except Exception as ex:
-                result_queue.put(None)
                 log.exception(ex)
     log.info('Manager Worker %s exiting.' % str(os.getpid()))
+
+
+class SimpleReceiver(object):
+    def __init__(self):
+        self.result = None
+
+    def is_fullfilled(self):
+        return self.result is not None
+
+    def add(self, value):
+        self.result = value
+
+    def get(self):
+        if self.result.exception:
+            raise self.result.exception
+        return self.result.value[0]
+
+
+class MapReceiver(object):
+    def __init__(self, num):
+        self.result = []
+        self.num = num
+
+    def is_fullfilled(self):
+        return len(self.result) == self.num
+
+    def add(self, value):
+        self.result.append(value)
+
+    def get(self):
+        results = []
+        for server_result in sorted(self.result, key=lambda sr: sr.seq_id):
+            if server_result.exception:
+                raise server_result.exception
+            results.extend(server_result.value)
+        return results
 
 
 class Result(object):
@@ -66,27 +101,12 @@ class Result(object):
         self.id = o_id
 
     def get(self):
-        while self.id not in self.manager.reply_board:
-            try:
-                result = self.manager.result_queue.get()
-            except IOError as ioe:
-                if ioe.errno != errno.EINTR:
-                    raise
-
-            self.manager.result_queue.task_done()
-            if result.id == self.id:
-                if result.exception:
-                    raise result.exception
-                return result.value
-            self.manager.reply_board[result.id] = result
-        result = self.manager.reply_board[self.id]
-        del self.manager.reply_board[self.id]
-        if result.exception:
-            raise result.exception
-        return result.value
+        return self.manager.get_response(self.id)
 
 
 class HostManager(object):
+    serial_id = 0
+
     def __init__(self, host=default_host, port=default_port, pool_size=10):
         self.host = host
         self.port = port
@@ -109,13 +129,50 @@ class HostManager(object):
         for w in self.workers:
             w.join()
 
+    @classmethod
+    def new_id(cls):
+        id_ = cls.serial_id
+        cls.serial_id += 1
+        return id_
+
     def apply_async(self, obj):
         log.debug('Putting %s on task queue.' % obj)
+        id_ = self.new_id()
+        obj.id = id_
+        self.reply_board[id_] = SimpleReceiver()
         self.task_queue.put(obj)
-        return Result(self, obj.id)
+        return Result(self, id_)
+
+    def map(self, objs):
+        id_ = self.new_id()
+        self.reply_board[id_] = MapReceiver(len(objs))
+        for obj in objs:
+            obj.id = id_
+            self.task_queue.put(obj)
+        return Result(self, id_)
+
+    def get_response(self, id_):
+        if id_ not in self.reply_board:
+            raise Exception('Get cannot be called for id: %s' % id_)
+
+        receiver = self.reply_board[id_]
+        while not receiver.is_fullfilled():
+            result = None
+            try:
+                result = self.result_queue.get()
+            except IOError as ioe:
+                if ioe.errno != errno.EINTR:
+                    raise
+                else:
+                    continue
+            self.result_queue.task_done()
+            self.reply_board[result.id].add(result)
+        receiver = self.reply_board[id_]
+        del self.reply_board[id_]
+        return receiver.get()
 
 
-class TaskRegistry(object):
+class DelegateRegistry(object):
     registry = {}
 
     @classmethod

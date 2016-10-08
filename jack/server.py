@@ -21,24 +21,30 @@ def stop_handler(sig, frame):
     stop = True
 
 
+def handle_processor(processor):
+    try:
+        result = processor.call()
+        log.debug(result)
+        if processor.expect_result:
+            return ServerResult(value=result, id=processor.id, exception=None, seq_id=processor.seq_id)
+    except Exception as ex:
+        log.debug(ex)
+        if processor.expect_result:
+            return ServerResult(value=None, id=processor.id, exception=ex, seq_id=processor.seq_id)
+
+
 def handle_job(beanstalk, job):
-    processor = None
     try:
         processor = deserialize(job.body)
         job.delete()
-        call_result = processor.call()
-        if processor.expect_result:
-            result = ServerResult(value=call_result, id=processor.id, exception=None)
+        result = handle_processor(processor)
+        if processor.expect_result and result:
             beanstalk.use(processor.result_queue)
             beanstalk.put(serialize(result))
     except beanstalkc.BeanstalkcException as be:
         raise be
     except Exception as ex:
-        if processor and processor.expect_result:
-            beanstalk.use(processor.result_queue)
-            result = ServerResult(value=None, id=processor.id, exception=ex)
-            beanstalk.put(serialize(result))
-        log.debug(ex)
+        log.exception(ex)
 
 
 def worker(host, port, queues):
