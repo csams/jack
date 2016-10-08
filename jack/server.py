@@ -39,6 +39,7 @@ def handle_job(beanstalk, job):
         if processor.expect_result and result:
             beanstalk.use(processor.result_queue)
             beanstalk.put(serialize(result))
+            beanstalk.use('default')
     except beanstalkc.BeanstalkcException as be:
         raise be
     except Exception as ex:

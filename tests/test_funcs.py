@@ -49,10 +49,10 @@ class Test(unittest.TestCase):
     def test_large_map(self):
         pairs = []
         expected = []
-        for i in range(100):
+        for i in range(100000):
             pairs.append(([i, i+1], {}))
             expected.append(i + (i+1))
-        result = add.map(pairs)
+        result = add.map(pairs, chunk_size=100)
         sum_ = result.get()
         self.assertEquals(sum_, expected)
 
