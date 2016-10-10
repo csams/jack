@@ -107,6 +107,7 @@ class Task(object):
 def task(host=default_host, port=default_port, queue='default', expect_result=True, ttr=DEFAULT_TTR):
     def inner(func):
         name = '.'.join([func.__module__, func.__name__])
+        log.info('Registering task for %s' % name)
         DelegateRegistry.register(name, func)
         t = Task(func, host=host, port=port, queue=queue, expect_result=expect_result, ttr=ttr)
         mod = sys.modules[func.__module__]
