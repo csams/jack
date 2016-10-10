@@ -81,6 +81,7 @@ def parse_args():
     parser.add_argument('-w', '--workers', default=mp.cpu_count(), type=int, help='Number of worker processes to use.')
     parser.add_argument('--host', default=default_host)
     parser.add_argument('-p', '--port', default=default_port, type=int)
+    parser.add_argument('-l', '--level', default='WARN', help='Logging level.')
     return parser.parse_args()
 
 
@@ -91,10 +92,13 @@ def main():
     num_workers = args.workers
     host = args.host
     port = args.port
+    level = args.level
+    logging.basicConfig(level=level)
     log.info('Host: %s' % host)
     log.info('Port: %i' % port)
     log.info('Workers: %i' % num_workers)
     log.info('Queues: %s' % args.queues)
+    log.info('Log Level: %s' % args.level)
 
     for i in imports:
         log.info('Loading %s' % i)
@@ -113,5 +117,4 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
     main()
