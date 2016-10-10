@@ -1,7 +1,9 @@
+bin
+Jack.egg-info
 lib
 lib64
 include
-bin
+share
 pip-selfcheck.json
 *.pyc
 .cache

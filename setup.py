@@ -46,7 +46,7 @@ setup(
     ],
     extras_require={"develop": [
         'flake8',
-        'ipython'
+        'ipython',
         'pytest'
     ]},
     cmdclass={
