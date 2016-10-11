@@ -18,7 +18,6 @@ stop = False
 
 def stop_handler(sig, frame):
     global stop
-    log.info('Terminating process..')
     stop = True
 
 
@@ -39,7 +38,6 @@ def local_worker(task_queue, result_queue, host, port):
             if not obj:
                 continue
             task_queue.task_done()
-            log.debug('Got %s to work on.' % str(obj))
             try:
                 obj.result_queue = obj.name + queue_id
                 beanstalk.use(obj.queue)
@@ -47,11 +45,8 @@ def local_worker(task_queue, result_queue, host, port):
                 if obj.expect_result:
                     beanstalk.watch(obj.result_queue)
                     beanstalk.ignore('default')
-                    log.debug('Looking for response on %s' % obj.result_queue)
                     job = beanstalk.reserve()
-                    log.debug('Got result %s:' % job.body)
                     result = deserialize(job.body)
-                    log.debug('Deserialized result %s:' % job.body)
                     job.delete()
                     result_queue.put(result)
             except Exception as ex:

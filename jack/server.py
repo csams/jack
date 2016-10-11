@@ -27,6 +27,7 @@ def handle_processor(processor):
         if processor.expect_result:
             return ServerResult(value=result, id=processor.id, exception=None, seq_id=processor.seq_id)
     except Exception as ex:
+        log.debug(ex)
         if processor.expect_result:
             return ServerResult(value=None, id=processor.id, exception=ex, seq_id=processor.seq_id)
 
