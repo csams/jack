@@ -72,18 +72,20 @@ class SimpleReceiver(object):
 
 class MapReceiver(object):
     def __init__(self, num):
-        self.result = []
+        self.result = [None] * num
+        self.returned = 0
         self.num = num
 
     def is_fullfilled(self):
-        return len(self.result) == self.num
+        return self.returned == self.num
 
     def add(self, value):
-        self.result.append(value)
+        self.result[value.seq_id] = value
+        self.returned += 1
 
     def get(self):
         results = []
-        for server_result in sorted(self.result, key=lambda sr: sr.seq_id):
+        for server_result in self.result:
             if server_result.exception:
                 raise server_result.exception
             results.extend(server_result.value)
