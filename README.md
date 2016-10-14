@@ -1,7 +1,7 @@
 # jack
 Simple Python task framework for beanstalkd
 
-## Start beanstalkd in the background on some node
+## Start beanstalkd in the background on some host
 ```bash
 beanstalkd -l 0.0.0.0 -p 11300 2>&1 > beanstalk.out &
 ```
@@ -32,7 +32,7 @@ from ops import add
 
 with closing(ManagerRegistry.create()):
 
-    # executes directly in the this process
+    # executes directly in this process
     result = add(2, 3)
     print result
 
