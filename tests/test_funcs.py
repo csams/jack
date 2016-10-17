@@ -11,6 +11,7 @@ from jack import ManagerRegistry
 logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:%(process)d %(message)s')
 log = logging.getLogger(__name__)
 
+
 class Test(unittest.TestCase):
 
     @classmethod
@@ -50,8 +51,8 @@ class Test(unittest.TestCase):
         pairs = []
         expected = []
         for i in range(100000):
-            pairs.append(([i, i+1], {}))
-            expected.append(i + (i+1))
+            pairs.append(([i, i + 1], {}))
+            expected.append(i + (i + 1))
         result = add.map(pairs, chunk_size=100)
         sum_ = result.get()
         self.assertEquals(sum_, expected)
