@@ -55,7 +55,7 @@ If you want your task to execute on a host other
 than the one for which it was originally declared,
 just ensure a HostManager is created and change
 the host attribute on the task. The default host
-if none is given is 0.0.0.0.
+is 0.0.0.0 if none is given.
 ```python
 # main.py
 
@@ -91,4 +91,28 @@ with closing(ManagerRegistry):
 
     print result1.get()
     print result2.get()
+```
+
+## Map
+Sometimes it's useful to map a function over a list of arguments.  Since functions
+may have regular and keyword arguments, we have to construct the list as a list of 
+(args, kwargs) tuples.  Also, instead of executing each individual argument in
+a separate process, a chunk\_size kwarg to map allows grouping a configurable
+number of args to be allocated to a single remote process for serial execution.
+This can help cut down on serialization and network overhead.  Note that this
+is for remote execution on a single host.
+```python
+# main.py
+
+from contextlib import closing
+from jack import ManagerRegistry
+from ops import add
+
+with closing(ManagerRegistry.create()):
+    args = [((i, i + 1), {}) for i in range(100)]
+    results = add.map(args).get()
+    print results
+
+    results = add.map(args, chunk_size=20).get()
+    print results
 ```
