@@ -95,12 +95,12 @@ with closing(ManagerRegistry):
 
 ## Map
 Sometimes it's useful to map a function over a list of arguments.  Since functions
-may have regular and keyword arguments, we have to construct the list as a list of 
-(args, kwargs) tuples.  Also, instead of executing each individual argument in
-a separate process, a chunk\_size kwarg to map allows grouping a configurable
-number of args to be allocated to a single remote process for serial execution.
-This can help cut down on serialization and network overhead.  Note that this
-is for remote execution on a single host.
+may have regular and keyword arguments, we have to construct the args list as a list
+of (args, kwargs) tuples.  Also, instead of executing each individual argument tuple in
+a separate process, a chunk\_size kwarg allows grouping a configurable number of args
+for allocation to a single remote process for serial execution.  This can help cut down
+on serialization and network overhead.  Note that this is for remote execution on a
+single host.
 ```python
 # main.py
 
